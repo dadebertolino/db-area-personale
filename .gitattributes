@@ -1,0 +1,50 @@
+# ============================================================================
+# Line endings — sempre LF nel repo, normalizzazione automatica al checkout
+# ============================================================================
+
+* text=auto eol=lf
+
+*.php   text eol=lf diff=php
+*.js    text eol=lf
+*.css   text eol=lf
+*.scss  text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.xml   text eol=lf
+*.svg   text eol=lf
+*.html  text eol=lf
+
+# File binari espliciti
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.zip   binary
+*.mo    binary
+
+# ============================================================================
+# export-ignore — file esclusi dagli archivi generati da GitHub Releases
+# (mantieni il repo pulito ma il distribuibile minimal)
+# ============================================================================
+
+/.github            export-ignore
+/.gitignore         export-ignore
+/.gitattributes     export-ignore
+/.editorconfig      export-ignore
+/tests              export-ignore
+/.phpcs.xml.dist    export-ignore
+/phpunit.xml.dist   export-ignore
+/CONTRIBUTING.md    export-ignore
+/docs               export-ignore
+/composer.lock      export-ignore
+/package-lock.json  export-ignore
+/node_modules       export-ignore
+/vendor             export-ignore

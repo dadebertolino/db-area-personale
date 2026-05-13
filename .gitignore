@@ -1,0 +1,71 @@
+# ============================================================================
+# DB Area Personale — .gitignore
+# ============================================================================
+
+# --- Dependency managers --------------------------------------------------
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# --- Build output ---------------------------------------------------------
+/assets/dist/
+*.min.js
+*.min.css
+
+# --- Local config / secrets -----------------------------------------------
+.env
+.env.local
+.env.*.local
+wp-config-local.php
+
+# --- IDE / editor ---------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Logs / cache ---------------------------------------------------------
+*.log
+error_log
+debug.log
+/logs/
+.cache/
+.phpunit.result.cache
+
+# --- OS junk --------------------------------------------------------------
+.DS_Store
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# --- Test coverage --------------------------------------------------------
+/tests/coverage/
+/tests/_output/
+clover.xml
+coverage.xml
+
+# --- Tool config (commit instead if shared) -------------------------------
+.phpcs.xml
+phpunit.xml
+
+# --- Generated translations (build artifacts) -----------------------------
+# Conserviamo .pot (template); generiamo .mo dal .po al build.
+*.mo
+
+# --- Backups --------------------------------------------------------------
+*.bak
+*.orig
+*.rej
+
+# --- Local docker / dev environment ---------------------------------------
+docker-compose.override.yml
+.docker/
+
+# --- WordPress-specific (in caso di test locale dentro il plugin) ---------
+wp-content/
+uploads/

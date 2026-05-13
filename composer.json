@@ -1,0 +1,46 @@
+{
+  "name": "dadebertolino/db-area-personale",
+  "description": "Portale interno unificato per il personale e gli studenti dell'IIS Cigna-Baruffi-Garelli. Plugin WordPress che fornisce dashboard widget, SSO Google Workspace, anagrafica classi, news interne, bacheca sindacale, approvazioni e notifiche.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Davide Bertolino",
+      "email": "info@davidebertolino.it",
+      "homepage": "https://www.davidebertolino.it"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "google/apiclient": "^2.15",
+    "spomky-labs/otphp": "^11.2",
+    "woocommerce/action-scheduler": "^3.7"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6",
+    "wp-coding-standards/wpcs": "^3.0",
+    "squizlabs/php_codesniffer": "^3.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "CBG\\AP\\": "includes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CBG\\AP\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "scripts": {
+    "lint": "phpcs --standard=WordPress includes/",
+    "test": "phpunit"
+  },
+  "minimum-stability": "stable"
+}
