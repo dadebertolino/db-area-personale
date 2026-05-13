@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added — ruoli e capability custom
+- `includes/roles/role-definitions.php` — definizioni dichiarative degli 8 ruoli `cbg_*` (docente, docente_pubblicatore, dsga, dirigente, ata, rsu, studente, genitore) e di 15 capability custom CBG conformi a §2.1 e §3.2 del documento di requisiti v1.2.
+- `CBG_AP_Roles` — registrazione e sincronizzazione idempotente dei ruoli. Versione governata dalla costante `CBG_AP_ROLES_VERSION`: bump = riconciliazione automatica al prossimo bootstrap.
+- `CBG_AP_Capabilities` — gestione delle **capability dinamiche per tipo news** via `map_meta_cap`. La meta-cap `cbg_ap_publish_news_type` (con term_id come argomento) viene risolta dinamicamente leggendo dalla tabella `cbg_ap_user_news_capabilities` (opzione 2 del design: data-driven, no migrazione cap quando si aggiunge un tipo news). API: `grant_news_type_to_user()`, `revoke_news_type_from_user()`, cache per-request.
+- `functions-permissions.php` — API pubblica per check di permessi: `cbg_ap_user_can_access_area()`, `cbg_ap_user_can_publish_news_type()`, `cbg_ap_user_can_publish_bacheca_sindacale()`, `cbg_ap_user_can_approve_news()`, `cbg_ap_user_has_role()`, `cbg_ap_user_has_any_role()`, `cbg_ap_is_docente()`, `cbg_ap_is_studente()`, `cbg_ap_is_dirigente()`, `cbg_ap_is_dsga()`, `cbg_ap_require_capability()`.
+- `CBG_AP_Activator::register_roles()` — al primo attivazione del plugin i ruoli vengono creati e all'`administrator` viene concessa l'intera suite di capability CBG.
+- Cumulabilità ruoli (§2.1): un utente può cumulare ruoli CBG senza modifiche al codice; WordPress gestisce nativamente l'union delle capability.
+- Soft sync su `init`: ad ogni bootstrap, se la versione delle definizioni è cambiata, le capability dei ruoli vengono riallineate (senza rimuovere quelle aggiunte manualmente dall'admin).
+- `uninstall.php` esteso: rimozione delle capability CBG da TUTTI i ruoli del sistema (incluso `administrator`).
+
 ### Added — repository GitHub
 - `.gitignore`, `.gitattributes` (con `export-ignore` per release pulite), `.editorconfig` allineato ai WordPress Coding Standards.
 - `CONTRIBUTING.md` con setup ambiente, convenzioni di naming, branch model, standard di sicurezza.

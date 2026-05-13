@@ -55,6 +55,7 @@ foreach ( $tables as $table ) {
 
 $options = array(
 	'cbg_ap_db_version',
+	'cbg_ap_roles_version',
 	'cbg_ap_sso_group_mapping',
 	'cbg_ap_sso_allowed_domain',
 	'cbg_ap_anno_scolastico_corrente',
@@ -130,16 +131,40 @@ foreach ( $cbg_roles as $role ) {
 	remove_role( $role );
 }
 
-// Rimuovi le capability custom dagli altri ruoli (administrator, editor, ecc.).
-$cbg_caps = $wpdb->get_col(
-	$wpdb->prepare(
-		"SELECT DISTINCT meta_key FROM {$wpdb->usermeta} WHERE meta_key LIKE %s",
-		$wpdb->esc_like( $wpdb->prefix . 'capabilities' )
-	)
+// Rimuovi le capability custom CBG da TUTTI i ruoli (incluso administrator,
+// editor, ecc.). Non possiamo "caricare" il file role-definitions in modalità
+// uninstall (il plugin è già disattivato), quindi enumeriamo gli slug cap
+// hardcoded — devono restare allineati con includes/roles/role-definitions.php.
+$cbg_caps_to_remove = array(
+	'cbg_ap_access_area_personale',
+	'cbg_ap_publish_news',
+	'cbg_ap_publish_bacheca_sindacale',
+	'cbg_ap_publish_comunicazione_ds',
+	'cbg_ap_approve_news',
+	'cbg_ap_approve_assenze',
+	'cbg_ap_approve_moduli',
+	'cbg_ap_manage_classi',
+	'cbg_ap_manage_news_types',
+	'cbg_ap_manage_sso_mapping',
+	'cbg_ap_manage_capabilities',
+	'cbg_ap_view_access_log',
+	'cbg_ap_import_data',
+	'cbg_ap_manage_system',
+	'cbg_ap_force_2fa_for_role',
 );
-// In pratica le capability sono in option `wp_user_roles`, gestita automaticamente
-// da remove_role. Lasciamo l'enumerazione su user level solo come safety net.
-unset( $cbg_caps );
+
+$wp_roles = wp_roles();
+foreach ( $wp_roles->roles as $role_slug => $role_data ) {
+	$role = get_role( $role_slug );
+	if ( ! $role ) {
+		continue;
+	}
+	foreach ( $cbg_caps_to_remove as $cap ) {
+		if ( $role->has_cap( $cap ) ) {
+			$role->remove_cap( $cap );
+		}
+	}
+}
 // phpcs:enable
 
 /* -----------------------------------------------------------------------------

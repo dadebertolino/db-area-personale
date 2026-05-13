@@ -26,12 +26,13 @@ class CBG_AP_Activator {
 		self::create_default_options();
 		self::generate_cron_secret_if_missing();
 		self::seed_news_types();
+		self::register_roles();
 		self::update_db_version();
 
-		// I ruoli, le capability e i job Action Scheduler vengono inizializzati
-		// dai rispettivi moduli al primo bootstrap post-attivazione, per evitare
-		// dipendenze hard durante l'attivazione (Action Scheduler potrebbe non
-		// essere ancora caricato se installato come libreria Composer).
+		// I job Action Scheduler vengono inizializzati dai rispettivi moduli
+		// al primo bootstrap post-attivazione, per evitare dipendenze hard
+		// durante l'attivazione (Action Scheduler potrebbe non essere ancora
+		// caricato se installato come libreria Composer).
 
 		// Flush rewrite rules per registrare le route /area-personale/*
 		// (le rule effettive vengono aggiunte dal router al prossimo init).
@@ -40,6 +41,26 @@ class CBG_AP_Activator {
 		// Set di flag che il bootstrap successivo userà per completare
 		// le operazioni che richiedono il plugin caricato.
 		update_option( 'cbg_ap_needs_post_activation_setup', 1, false );
+	}
+
+	/**
+	 * Carica le definizioni di ruoli e capability e le sincronizza.
+	 *
+	 * Viene chiamata sia in fase di attivazione sia (in modo idempotente)
+	 * al primo bootstrap dopo bump di CBG_AP_ROLES_VERSION.
+	 *
+	 * @return void
+	 */
+	protected static function register_roles() {
+		require_once CBG_AP_INCLUDES_DIR . 'roles/role-definitions.php';
+		require_once CBG_AP_INCLUDES_DIR . 'roles/class-cbg-ap-roles.php';
+
+		// All'attivazione siamo fuori dal normale ciclo di `plugins_loaded`,
+		// quindi l'hook auto-istanziatore non gira. Istanziamo direttamente.
+		$instance = new CBG_AP_Roles();
+		$instance->sync_roles();
+
+		update_option( 'cbg_ap_roles_version', CBG_AP_ROLES_VERSION, false );
 	}
 
 	/**
@@ -366,6 +387,10 @@ class CBG_AP_Activator {
 
 		// Versione DB per gestione migrazioni future.
 		add_option( 'cbg_ap_db_version', '0.0.0', '', 'no' );
+
+		// Versione delle definizioni ruoli (vedi CBG_AP_ROLES_VERSION).
+		// 0.0.0 forza la sincronizzazione al primo bootstrap.
+		add_option( 'cbg_ap_roles_version', '0.0.0', '', 'no' );
 	}
 
 	/**
