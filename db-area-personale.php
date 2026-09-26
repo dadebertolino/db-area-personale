@@ -3,7 +3,7 @@
  * Plugin Name:       DB Area Personale
  * Plugin URI:        https://www.davidebertolino.it/progetti/db-area-personale/
  * Description:       Portale interno unificato per il personale e gli studenti dell'IIS Cigna-Baruffi-Garelli. Sostituisce la bacheca WordPress per ruoli non amministrativi con una dashboard a widget, integra SSO Google Workspace, anagrafica classi, news interne, bacheca sindacale, approvazioni e notifiche.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author:            Davide Bertolino
@@ -17,6 +17,21 @@
  * @package CBG_AP
  */
 
+/*
+ * Privacy capabilities (per references/PRIVACY-INTEGRATION.md):
+ *  - Personal data:        YES — log accessi (wp_cbg_ap_access_log: user_id, username,
+ *                          IP, user agent), preferenze/layout/conferme di lettura,
+ *                          notifiche, dispositivi noti, stato 2FA, anagrafica classi,
+ *                          user meta cbg_ap_*
+ *  - Third-party scripts:  NO — nessuno script esterno sul frontend (l'SSO Google è
+ *                          un redirect OIDC server-side)
+ *  - User consent:         NO — nessun consenso raccolto (basi giuridiche 6.1.b/c/e/f)
+ *  - DSAR-aware:           YES — CBG_AP_Privacy_DSAR (3 exporter + 3 eraser, doppio canale)
+ *  - Hub-aware:            YES — CBG_AP_Privacy_Declarations su dbph_processing_register
+ *                          (+ legacy dbseo_processing_register), filter dbph_dsar_available
+ *  - Retention:            pulizia giornaliera log accessi (CBG_AP_Access_Log_Retention)
+ */
+
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
@@ -24,7 +39,7 @@ defined( 'ABSPATH' ) || exit;
  * Costanti del plugin
  * -------------------------------------------------------------------------- */
 
-define( 'CBG_AP_VERSION',      '1.0.0' );
+define( 'CBG_AP_VERSION',      '1.1.0' );
 define( 'CBG_AP_DB_VERSION',   '1.0.0' );
 define( 'CBG_AP_MIN_PHP',      '8.1' );
 define( 'CBG_AP_MIN_WP',       '6.0' );
@@ -41,6 +56,45 @@ define( 'CBG_AP_ASSETS_URL',   CBG_AP_PLUGIN_URL . 'assets/dist/' );
 define( 'CBG_AP_TEXT_DOMAIN',  'cbg-ap' );
 define( 'CBG_AP_REST_NS',      'cbg-ap/v1' );
 define( 'CBG_AP_FRONT_BASE',   'area-personale' );
+
+// Marker DSAR (Capability 1). L'Hub riconosce i marker solo per prefissi noti:
+// per questo prefisso la disponibilità è segnalata anche dal filter
+// `dbph_dsar_available` (vedi CBG_AP_Privacy_DSAR::init()).
+define( 'CBG_AP_DSAR_AVAILABLE', true );
+
+/* -----------------------------------------------------------------------------
+ * GitHub Auto-Updater (componente condiviso DB, guardato: il file può mancare
+ * in build personalizzate e la classe può essere già definita da un altro plugin DB)
+ * -------------------------------------------------------------------------- */
+
+if ( file_exists( CBG_AP_INCLUDES_DIR . 'class-updater.php' ) ) {
+	require_once CBG_AP_INCLUDES_DIR . 'class-updater.php';
+}
+if ( class_exists( 'DB_GitHub_Updater' ) ) {
+	new DB_GitHub_Updater( __FILE__, 'dadebertolino', 'db-area-personale' );
+}
+
+/**
+ * Registra il design system admin condiviso (db-admin-ui.css).
+ *
+ * Handle condiviso `db-admin-ui`: se un altro plugin DB lo ha già registrato
+ * resta valido il primo (il file è identico). Accodato solo nelle schermate
+ * admin del plugin (id schermata contenente `cbg-ap` / `cbg_ap`); i CSS
+ * specifici del plugin devono dichiararlo come dipendenza.
+ *
+ * @param string $hook_suffix Hook della schermata admin.
+ * @return void
+ */
+function cbg_ap_register_admin_ui( $hook_suffix ) {
+	if ( ! wp_style_is( 'db-admin-ui', 'registered' ) ) {
+		wp_register_style( 'db-admin-ui', CBG_AP_PLUGIN_URL . 'assets/css/db-admin-ui.css', array(), CBG_AP_VERSION );
+	}
+
+	if ( false !== strpos( (string) $hook_suffix, 'cbg-ap' ) || false !== strpos( (string) $hook_suffix, 'cbg_ap' ) ) {
+		wp_enqueue_style( 'db-admin-ui' );
+	}
+}
+add_action( 'admin_enqueue_scripts', 'cbg_ap_register_admin_ui', 5 );
 
 /* -----------------------------------------------------------------------------
  * Compatibilità ambiente

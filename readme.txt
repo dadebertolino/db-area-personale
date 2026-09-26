@@ -4,7 +4,7 @@ Tags: school, portal, sso, google-workspace, dashboard
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,11 @@ Sviluppato su misura per l'IIS Cigna-Baruffi-Garelli (Mondovì, CN). Non distrib
 Documentazione completa in `docs/deployment.md`.
 
 == Changelog ==
+
+= 1.1.0 =
+* Integrazione DB Privacy Hub: registro trattamenti (cbgap_*), DSAR export/cancellazione su doppio canale, marker CBG_AP_DSAR_AVAILABLE.
+* Pulizia giornaliera del log accessi (12 mesi, configurabile).
+* GitHub auto-updater, design system admin condiviso, workflow di release.
 
 = 1.0.0 =
 * Rilascio iniziale conforme al documento di requisiti v1.1.

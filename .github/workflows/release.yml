@@ -1,0 +1,77 @@
+name: Release
+
+# L'auto-updater (DB_GitHub_Updater) legge /releases/latest e usa il PRIMO
+# asset .zip trovato; in assenza di asset ripiega su zipball_url, che però ha
+# la cartella radice sbagliata ({repo}-{hash}/ invece di db-area-personale/).
+# Questo workflow garantisce quindi che ogni Release abbia SEMPRE uno ZIP
+# costruito correttamente: cartella radice db-area-personale/, senza file di
+# sviluppo (.github, tests, docs, composer.json, .phpcs.xml.dist, ecc.).
+#
+# Uso: push di un tag v* (es. v1.1.0). Il workflow verifica che il tag
+# corrisponda alla versione nel plugin header e nella costante CBG_AP_VERSION,
+# builda lo ZIP e crea la Release con l'asset allegato.
+#
+# NB: vendor/ è escluso come nel Privacy Hub. Quando i moduli che usano le
+# dipendenze Composer (google/apiclient, otphp, action-scheduler) saranno
+# attivi, aggiungere qui `composer install --no-dev --optimize-autoloader`
+# e rimuovere l'esclusione di vendor.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches plugin version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PLUGIN_VERSION=$(grep -oP '^\s*\*\s*Version:\s*\K[0-9.]+' db-area-personale.php)
+          CONST_VERSION=$(grep -oP "define\( 'CBG_AP_VERSION',\s*'\K[0-9.]+" db-area-personale.php)
+          echo "Tag: $TAG_VERSION — Header: $PLUGIN_VERSION — Costante: $CONST_VERSION"
+          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ] || [ "$TAG_VERSION" != "$CONST_VERSION" ]; then
+            echo "::error::Il tag ($TAG_VERSION) non corrisponde alla versione del plugin (header: $PLUGIN_VERSION, costante: $CONST_VERSION)."
+            exit 1
+          fi
+
+      - name: Build plugin ZIP
+        run: |
+          mkdir -p build/db-area-personale
+          rsync -a ./ build/db-area-personale/ \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'build' \
+            --exclude 'vendor' \
+            --exclude 'node_modules' \
+            --exclude 'tests' \
+            --exclude 'docs' \
+            --exclude 'composer.json' \
+            --exclude 'composer.lock' \
+            --exclude '.phpcs.xml.dist' \
+            --exclude 'phpunit.xml.dist' \
+            --exclude 'CONTRIBUTING.md' \
+            --exclude '.editorconfig' \
+            --exclude '.gitattributes' \
+            --exclude '.gitignore' \
+            --exclude '.distignore' \
+            --exclude '.DS_Store' \
+            --exclude '*.zip'
+          cd build
+          zip -r "db-area-personale.zip" db-area-personale
+          unzip -l db-area-personale.zip | head -20
+
+      - name: Create GitHub Release with asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/db-area-personale.zip
+          generate_release_notes: true
+          # Il body generato viene mostrato dall'updater nella scheda
+          # "Dettagli versione" di WordPress (campo description).

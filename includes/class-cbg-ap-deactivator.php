@@ -40,6 +40,9 @@ class CBG_AP_Deactivator {
 	 * @return void
 	 */
 	protected static function unschedule_jobs() {
+		// Pulizia log accessi (1.1.0): evento WP-Cron, indipendente da Action Scheduler.
+		wp_clear_scheduled_hook( 'cbg_ap_cleanup_access_log' );
+
 		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
 			return;
 		}

@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-09-26
+
+### Added — integrazione ecosistema DB privacy
+- `CBG_AP_Privacy_Declarations` — dichiarazione dinamica dei trattamenti (`cbgap_*`, 8 campi) su `dbph_processing_register` + legacy `dbseo_processing_register`.
+- `CBG_AP_Privacy_DSAR` — 3 exporter + 3 eraser (area personale, notifiche, log accessi) su doppio canale Hub/core, paginati; conservazioni segnalate (log accessi, 2FA, anagrafica); pulizia su `deleted_user`.
+- `CBG_AP_Access_Log_Retention` — cron giornaliero `cbg_ap_cleanup_access_log` (12 mesi, option/filter `cbg_ap_access_log_retention_months`).
+- Marker `CBG_AP_DSAR_AVAILABLE` + filter `dbph_dsar_available`; blocco "Privacy capabilities" nel file principale.
+- Componenti condivisi: `includes/class-updater.php` (`DB_GitHub_Updater`), `assets/css/db-admin-ui.css`; workflow `release.yml`; ruleset `.phpcs.xml.dist`.
+
+Dettaglio completo nella sezione Changelog del README.
+
 ### Added — ruoli e capability custom
 - `includes/roles/role-definitions.php` — definizioni dichiarative degli 8 ruoli `cbg_*` (docente, docente_pubblicatore, dsga, dirigente, ata, rsu, studente, genitore) e di 15 capability custom CBG conformi a §2.1 e §3.2 del documento di requisiti v1.2.
 - `CBG_AP_Roles` — registrazione e sincronizzazione idempotente dei ruoli. Versione governata dalla costante `CBG_AP_ROLES_VERSION`: bump = riconciliazione automatica al prossimo bootstrap.

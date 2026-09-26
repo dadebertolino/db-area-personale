@@ -173,6 +173,10 @@ final class CBG_AP_Plugin {
 		$this->maybe_require( 'cron/class-cbg-ap-cron-tick-handler.php' );
 		$this->maybe_require( 'cron/class-cbg-ap-job-registry.php' );
 
+		$this->maybe_require( 'privacy/class-cbg-ap-access-log-retention.php' );
+		$this->maybe_require( 'privacy/class-cbg-ap-privacy-declarations.php' );
+		$this->maybe_require( 'privacy/class-cbg-ap-privacy-dsar.php' );
+
 		$this->maybe_require( 'pwa/class-cbg-ap-pwa.php' );
 
 		$this->maybe_require( 'rest/class-cbg-ap-rest.php' );

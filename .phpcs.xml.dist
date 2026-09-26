@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<ruleset name="DB Area Personale">
+	<description>Coding standard per DB Area Personale (WordPress Coding Standards).</description>
+
+	<file>.</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/.git/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+	<!-- File condiviso verbatim tra tutti i plugin DB (stile proprio, versionato
+	     a parte): trattato come vendored. -->
+	<exclude-pattern>includes/class-updater\.php</exclude-pattern>
+
+	<arg value="sp"/>
+	<arg name="colors"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+
+	<!-- Compatibilità dichiarata nel plugin header. -->
+	<config name="minimum_wp_version" value="6.0"/>
+	<config name="testVersion" value="8.1-"/>
+
+	<rule ref="WordPress">
+		<!-- Nomi file class-cbg-ap-*.php: convenzione del progetto. -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<!-- Commenti in italiano: regole di punteggiatura docblock inglesi = rumore. -->
+		<exclude name="Squiz.Commenting"/>
+		<exclude name="Generic.Commenting"/>
+		<!-- Allineamento libero consolidato nel progetto. -->
+		<exclude name="WordPress.Arrays.MultipleStatementAlignment"/>
+		<exclude name="Generic.Formatting.MultipleStatementAlignment"/>
+		<!-- 15 tabelle custom: le query dirette sono l'architettura. -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery"/>
+		<!-- Nomi tabella SEMPRE da $wpdb->prefix + letterale, mai da input; i
+		     valori passano tutti da prepare(). -->
+		<exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared"/>
+	</rule>
+
+	<!-- Prefissi consentiti per funzioni/classi/hook/costanti globali. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="cbg_ap"/>
+				<element value="CBG_AP"/>
+				<element value="DB_GitHub_Updater"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Text domain del plugin. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="cbg-ap"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

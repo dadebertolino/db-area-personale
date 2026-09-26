@@ -168,8 +168,11 @@ foreach ( $wp_roles->roles as $role_slug => $role_data ) {
 // phpcs:enable
 
 /* -----------------------------------------------------------------------------
- * 6. Cancella job Action Scheduler residui
+ * 6. Cancella eventi WP-Cron e job Action Scheduler residui
  * -------------------------------------------------------------------------- */
+
+// Pulizia log accessi (1.1.0): evento WP-Cron giornaliero.
+wp_clear_scheduled_hook( 'cbg_ap_cleanup_access_log' );
 
 if ( function_exists( 'as_unschedule_all_actions' ) ) {
 	$hooks = array(
