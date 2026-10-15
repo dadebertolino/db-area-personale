@@ -29,7 +29,7 @@ jobs:
     name: Build & Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Verify tag matches plugin version
         run: |
@@ -69,7 +69,7 @@ jobs:
           unzip -l db-area-personale.zip | head -20
 
       - name: Create GitHub Release with asset
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: build/db-area-personale.zip
           generate_release_notes: true
